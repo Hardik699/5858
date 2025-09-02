@@ -17,7 +17,7 @@ import {
   Eye,
   EyeOff,
   FileText,
-  Sync,
+  RefreshCw,
 } from "lucide-react";
 import { googleSheetsSync } from "@/lib/googleSheetsSync";
 
@@ -148,7 +148,7 @@ export default function GoogleSheetsConfig() {
                   onClick={testConnection}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white"
                 >
-                  <Sync className="h-4 w-4 mr-2" />
+                  <RefreshCw className="h-4 w-4 mr-2" />
                   Test Connection
                 </Button>
               </div>
@@ -276,7 +276,7 @@ export default function GoogleSheetsConfig() {
                   onClick={testConnection}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white"
                 >
-                  <Sync className="h-4 w-4 mr-2" />
+                  <RefreshCw className="h-4 w-4 mr-2" />
                   Test Sync
                 </Button>
               )}
