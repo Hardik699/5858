@@ -1,7 +1,7 @@
 // Google Apps Script sync service
 export class GoogleAppsScriptSync {
   private static instance: GoogleAppsScriptSync;
-  private webAppUrl: string = '';
+  private webAppUrl: string = "";
   private isConfigured: boolean = false;
 
   private constructor() {
@@ -17,7 +17,7 @@ export class GoogleAppsScriptSync {
 
   // Load web app URL from localStorage or environment
   private loadConfiguration(): void {
-    const savedUrl = localStorage.getItem('googleAppsScriptWebAppUrl');
+    const savedUrl = localStorage.getItem("googleAppsScriptWebAppUrl");
     if (savedUrl) {
       this.webAppUrl = savedUrl;
       this.isConfigured = true;
@@ -28,19 +28,19 @@ export class GoogleAppsScriptSync {
   setWebAppUrl(url: string): void {
     if (!url) {
       this.isConfigured = false;
-      this.webAppUrl = '';
-      localStorage.removeItem('googleAppsScriptWebAppUrl');
+      this.webAppUrl = "";
+      localStorage.removeItem("googleAppsScriptWebAppUrl");
       return;
     }
 
     // Validate URL format
-    if (!url.includes('script.google.com') || !url.includes('/exec')) {
-      throw new Error('Invalid Google Apps Script Web App URL');
+    if (!url.includes("script.google.com") || !url.includes("/exec")) {
+      throw new Error("Invalid Google Apps Script Web App URL");
     }
 
     this.webAppUrl = url;
     this.isConfigured = true;
-    localStorage.setItem('googleAppsScriptWebAppUrl', url);
+    localStorage.setItem("googleAppsScriptWebAppUrl", url);
   }
 
   // Get current configuration status
@@ -54,35 +54,44 @@ export class GoogleAppsScriptSync {
   }
 
   // Sync all data to Google Apps Script
-  async syncAllData(): Promise<{ success: boolean; message: string; details?: any }> {
+  async syncAllData(): Promise<{
+    success: boolean;
+    message: string;
+    details?: any;
+  }> {
     try {
       if (!this.isReady()) {
         return {
           success: false,
-          message: 'Google Apps Script Web App URL not configured. Please set it up first.'
+          message:
+            "Google Apps Script Web App URL not configured. Please set it up first.",
         };
       }
 
       // Get data from localStorage
-      const pcLaptopData = JSON.parse(localStorage.getItem('pcLaptopAssets') || '[]');
-      const systemAssetsData = JSON.parse(localStorage.getItem('systemAssets') || '[]');
+      const pcLaptopData = JSON.parse(
+        localStorage.getItem("pcLaptopAssets") || "[]",
+      );
+      const systemAssetsData = JSON.parse(
+        localStorage.getItem("systemAssets") || "[]",
+      );
 
       // Prepare payload
       const payload = {
         pcLaptopData,
         systemAssetsData,
-        action: 'sync',
-        timestamp: new Date().toISOString()
+        action: "sync",
+        timestamp: new Date().toISOString(),
       };
 
       // Send to Google Apps Script
       const response = await fetch(this.webAppUrl, {
-        method: 'POST',
-        mode: 'cors',
+        method: "POST",
+        mode: "cors",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -90,25 +99,25 @@ export class GoogleAppsScriptSync {
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         return {
           success: true,
           message: `✅ Data synced successfully! Processed ${result.recordsProcessed?.pcLaptops || 0} PC/Laptops and ${result.recordsProcessed?.systemAssets || 0} system assets.`,
-          details: result
+          details: result,
         };
       } else {
         return {
           success: false,
-          message: `❌ Sync failed: ${result.error || 'Unknown error'}`,
-          details: result
+          message: `❌ Sync failed: ${result.error || "Unknown error"}`,
+          details: result,
         };
       }
     } catch (error) {
-      console.error('Google Apps Script sync error:', error);
+      console.error("Google Apps Script sync error:", error);
       return {
         success: false,
-        message: `❌ Sync failed: ${error instanceof Error ? error.message : 'Network error'}`
+        message: `❌ Sync failed: ${error instanceof Error ? error.message : "Network error"}`,
       };
     }
   }
@@ -119,7 +128,7 @@ export class GoogleAppsScriptSync {
       if (!this.isReady()) {
         return {
           success: false,
-          message: 'Web App URL not configured'
+          message: "Web App URL not configured",
         };
       }
 
@@ -127,17 +136,17 @@ export class GoogleAppsScriptSync {
       const testPayload = {
         pcLaptopData: [],
         systemAssetsData: [],
-        action: 'test',
-        timestamp: new Date().toISOString()
+        action: "test",
+        timestamp: new Date().toISOString(),
       };
 
       const response = await fetch(this.webAppUrl, {
-        method: 'POST',
-        mode: 'cors',
+        method: "POST",
+        mode: "cors",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(testPayload)
+        body: JSON.stringify(testPayload),
       });
 
       if (!response.ok) {
@@ -145,17 +154,17 @@ export class GoogleAppsScriptSync {
       }
 
       const result = await response.json();
-      
+
       return {
         success: result.success,
-        message: result.success 
-          ? '✅ Connection successful! Google Apps Script is working.'
-          : `❌ Connection failed: ${result.error}`
+        message: result.success
+          ? "✅ Connection successful! Google Apps Script is working."
+          : `❌ Connection failed: ${result.error}`,
       };
     } catch (error) {
       return {
         success: false,
-        message: `❌ Connection test failed: ${error instanceof Error ? error.message : 'Network error'}`
+        message: `❌ Connection test failed: ${error instanceof Error ? error.message : "Network error"}`,
       };
     }
   }
@@ -175,12 +184,12 @@ export class GoogleAppsScriptSync {
       try {
         const result = await this.syncAllData();
         if (result.success) {
-          console.log('Auto-sync to Google Sheets completed:', result.message);
+          console.log("Auto-sync to Google Sheets completed:", result.message);
         } else {
-          console.warn('Auto-sync failed:', result.message);
+          console.warn("Auto-sync failed:", result.message);
         }
       } catch (error) {
-        console.error('Auto-sync error:', error);
+        console.error("Auto-sync error:", error);
       }
     }, 2000); // Wait 2 seconds after last change
   }
@@ -193,8 +202,8 @@ export class GoogleAppsScriptSync {
 
   // Get Google Sheet URL (derived from web app URL)
   getGoogleSheetUrl(): string {
-    if (!this.webAppUrl) return '';
-    
+    if (!this.webAppUrl) return "";
+
     try {
       // Extract script ID from web app URL
       const match = this.webAppUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
@@ -203,10 +212,10 @@ export class GoogleAppsScriptSync {
         return `https://script.google.com/d/${scriptId}/edit`;
       }
     } catch (error) {
-      console.error('Could not derive sheet URL:', error);
+      console.error("Could not derive sheet URL:", error);
     }
-    
-    return '';
+
+    return "";
   }
 }
 
@@ -219,11 +228,11 @@ export const useGoogleAppsScriptAutoSync = () => {
     googleAppsScriptSync.autoSync();
   };
 
-  return { 
-    triggerAutoSync, 
+  return {
+    triggerAutoSync,
     isConfigured: googleAppsScriptSync.isReady(),
     setWebAppUrl: (url: string) => googleAppsScriptSync.setWebAppUrl(url),
     testConnection: () => googleAppsScriptSync.testConnection(),
-    manualSync: () => googleAppsScriptSync.manualSync()
+    manualSync: () => googleAppsScriptSync.manualSync(),
   };
 };

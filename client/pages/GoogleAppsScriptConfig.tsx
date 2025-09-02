@@ -19,7 +19,10 @@ import {
   Play,
   Lightbulb,
 } from "lucide-react";
-import { googleAppsScriptSync, useGoogleAppsScriptAutoSync } from "@/lib/googleAppsScriptSync";
+import {
+  googleAppsScriptSync,
+  useGoogleAppsScriptAutoSync,
+} from "@/lib/googleAppsScriptSync";
 
 export default function GoogleAppsScriptConfig() {
   const navigate = useNavigate();
@@ -55,7 +58,9 @@ export default function GoogleAppsScriptConfig() {
       checkConfiguration();
       alert("✅ Configuration saved successfully!");
     } catch (error) {
-      alert(`❌ Configuration error: ${error instanceof Error ? error.message : 'Invalid URL'}`);
+      alert(
+        `❌ Configuration error: ${error instanceof Error ? error.message : "Invalid URL"}`,
+      );
     }
   };
 
@@ -187,7 +192,7 @@ function doPost(e) {
                 {isConfigured ? "Connected" : "Not Connected"}
               </Badge>
             </div>
-            
+
             {isConfigured && webAppUrl && (
               <div className="space-y-2">
                 <span className="text-slate-300">Web App URL:</span>
@@ -216,17 +221,21 @@ function doPost(e) {
                   disabled={isTestingConnection}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white"
                 >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isTestingConnection ? 'animate-spin' : ''}`} />
-                  {isTestingConnection ? 'Testing...' : 'Test Connection'}
+                  <RefreshCw
+                    className={`h-4 w-4 mr-2 ${isTestingConnection ? "animate-spin" : ""}`}
+                  />
+                  {isTestingConnection ? "Testing..." : "Test Connection"}
                 </Button>
-                
+
                 <Button
                   onClick={handleManualSync}
                   disabled={isSyncing}
                   className="bg-blue-500 hover:bg-blue-600 text-white"
                 >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
-                  {isSyncing ? 'Syncing...' : 'Sync Now'}
+                  <RefreshCw
+                    className={`h-4 w-4 mr-2 ${isSyncing ? "animate-spin" : ""}`}
+                  />
+                  {isSyncing ? "Syncing..." : "Sync Now"}
                 </Button>
               </div>
             )}
@@ -236,11 +245,15 @@ function doPost(e) {
         {/* Configuration Card */}
         <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-white">Web App URL Configuration</CardTitle>
+            <CardTitle className="text-white">
+              Web App URL Configuration
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-slate-300">Google Apps Script Web App URL</Label>
+              <Label className="text-slate-300">
+                Google Apps Script Web App URL
+              </Label>
               <div className="flex gap-2">
                 <Input
                   value={inputUrl}
@@ -256,11 +269,12 @@ function doPost(e) {
                 </Button>
               </div>
             </div>
-            
+
             <Alert className="bg-blue-500/10 border-blue-500/50 text-blue-400">
               <Lightbulb className="h-4 w-4" />
               <AlertDescription>
-                Enter the Web App URL from your deployed Google Apps Script. This enables real-time auto-sync to your Google Sheet.
+                Enter the Web App URL from your deployed Google Apps Script.
+                This enables real-time auto-sync to your Google Sheet.
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -275,33 +289,55 @@ function doPost(e) {
             <Alert className="bg-green-500/10 border-green-500/50 text-green-400">
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
-                This method is simpler than server-side integration - no environment variables needed!
+                This method is simpler than server-side integration - no
+                environment variables needed!
               </AlertDescription>
             </Alert>
 
             <div className="space-y-4">
               <div className="bg-slate-800/50 p-4 rounded-lg">
                 <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">1</span>
+                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                    1
+                  </span>
                   Create Google Sheet
                 </h3>
                 <ol className="space-y-2 text-slate-300 text-sm list-decimal list-inside ml-4">
-                  <li>Go to <a href="https://sheets.google.com/" target="_blank" className="text-blue-400 hover:underline">Google Sheets</a></li>
+                  <li>
+                    Go to{" "}
+                    <a
+                      href="https://sheets.google.com/"
+                      target="_blank"
+                      className="text-blue-400 hover:underline"
+                    >
+                      Google Sheets
+                    </a>
+                  </li>
                   <li>Create a new blank spreadsheet</li>
                   <li>Name it "PC Laptop Assets Management" or similar</li>
-                  <li>Note: The script will automatically create all necessary sheets</li>
+                  <li>
+                    Note: The script will automatically create all necessary
+                    sheets
+                  </li>
                 </ol>
               </div>
 
               <div className="bg-slate-800/50 p-4 rounded-lg">
                 <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">2</span>
+                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                    2
+                  </span>
                   Open Apps Script
                 </h3>
                 <ol className="space-y-2 text-slate-300 text-sm list-decimal list-inside ml-4">
-                  <li>In your Google Sheet, go to <strong>Extensions → Apps Script</strong></li>
+                  <li>
+                    In your Google Sheet, go to{" "}
+                    <strong>Extensions → Apps Script</strong>
+                  </li>
                   <li>Delete the default code in the editor</li>
-                  <li>Copy the Google Apps Script code from the next section</li>
+                  <li>
+                    Copy the Google Apps Script code from the next section
+                  </li>
                   <li>Paste it into the Apps Script editor</li>
                   <li>Save the project (Ctrl+S)</li>
                 </ol>
@@ -309,16 +345,30 @@ function doPost(e) {
 
               <div className="bg-slate-800/50 p-4 rounded-lg">
                 <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">3</span>
+                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                    3
+                  </span>
                   Deploy as Web App
                 </h3>
                 <ol className="space-y-2 text-slate-300 text-sm list-decimal list-inside ml-4">
-                  <li>Click <strong>Deploy → New deployment</strong></li>
-                  <li>Click the gear icon → Select <strong>Web app</strong></li>
-                  <li>Set <strong>Execute as:</strong> Me (your email)</li>
-                  <li>Set <strong>Who has access:</strong> Anyone</li>
-                  <li>Click <strong>Deploy</strong></li>
-                  <li>Copy the <strong>Web app URL</strong> that appears</li>
+                  <li>
+                    Click <strong>Deploy → New deployment</strong>
+                  </li>
+                  <li>
+                    Click the gear icon → Select <strong>Web app</strong>
+                  </li>
+                  <li>
+                    Set <strong>Execute as:</strong> Me (your email)
+                  </li>
+                  <li>
+                    Set <strong>Who has access:</strong> Anyone
+                  </li>
+                  <li>
+                    Click <strong>Deploy</strong>
+                  </li>
+                  <li>
+                    Copy the <strong>Web app URL</strong> that appears
+                  </li>
                   <li>Paste it in the configuration above</li>
                 </ol>
               </div>
@@ -347,26 +397,30 @@ function doPost(e) {
               <Alert className="bg-yellow-500/10 border-yellow-500/50 text-yellow-400">
                 <FileText className="h-4 w-4" />
                 <AlertDescription>
-                  Copy this entire code and paste it into your Google Apps Script editor. The complete code is available in the project files at <code>google-apps-script/Code.gs</code>
+                  Copy this entire code and paste it into your Google Apps
+                  Script editor. The complete code is available in the project
+                  files at <code>google-apps-script/Code.gs</code>
                 </AlertDescription>
               </Alert>
-              
+
               <div className="bg-slate-800 p-4 rounded-lg overflow-x-auto">
                 <pre className="text-slate-300 text-sm whitespace-pre-wrap">
                   <code>{googleAppsScriptCode}</code>
                 </pre>
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
-                  onClick={() => window.open('https://script.google.com/', '_blank')}
+                  onClick={() =>
+                    window.open("https://script.google.com/", "_blank")
+                  }
                   variant="outline"
                   className="border-slate-600 text-slate-300"
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Open Apps Script
                 </Button>
-                
+
                 <Button
                   onClick={() => copyToClipboard(googleAppsScriptCode)}
                   variant="outline"
@@ -393,10 +447,11 @@ function doPost(e) {
                   Automatic Syncing
                 </h4>
                 <p className="text-slate-300 text-sm">
-                  Data automatically syncs when you save PC/Laptop configurations
+                  Data automatically syncs when you save PC/Laptop
+                  configurations
                 </p>
               </div>
-              
+
               <div className="space-y-2">
                 <h4 className="text-white font-medium flex items-center gap-2">
                   <FileText className="h-4 w-4 text-blue-400" />
@@ -406,7 +461,7 @@ function doPost(e) {
                   Organized data in separate sheets for each component category
                 </p>
               </div>
-              
+
               <div className="space-y-2">
                 <h4 className="text-white font-medium flex items-center gap-2">
                   <RefreshCw className="h-4 w-4 text-emerald-400" />
@@ -416,7 +471,7 @@ function doPost(e) {
                   Changes reflect in Google Sheets within seconds
                 </p>
               </div>
-              
+
               <div className="space-y-2">
                 <h4 className="text-white font-medium flex items-center gap-2">
                   <Settings className="h-4 w-4 text-purple-400" />

@@ -5,6 +5,7 @@ This guide will help you set up automatic syncing between your PC/Laptop managem
 ## Overview
 
 Once configured, your application will automatically:
+
 - ✅ Sync all PC/Laptop configurations to Google Sheets
 - ✅ Create separate sheets for each component category (Mouse, Keyboard, RAM, Storage, etc.)
 - ✅ Update data in real-time when you save changes
@@ -77,31 +78,37 @@ GOOGLE_SERVICE_ACCOUNT_CREDENTIALS={"type":"service_account","project_id":"your-
 ### Platform-Specific Instructions:
 
 #### **Netlify**
+
 1. Go to your site dashboard
 2. Navigate to "Site settings" → "Environment variables"
 3. Add both variables
 4. Redeploy your site
 
 #### **Vercel**
+
 1. Go to your project dashboard
 2. Navigate to "Settings" → "Environment Variables"
 3. Add both variables
 4. Redeploy your project
 
 #### **Railway**
+
 1. Go to your project dashboard
 2. Navigate to "Variables" tab
 3. Add both variables
 4. Railway will auto-redeploy
 
 #### **Heroku**
+
 1. Go to your app dashboard
 2. Navigate to "Settings" → "Config Vars"
 3. Add both variables
 4. Restart your dynos
 
 #### **Docker/VPS**
+
 Add to your `.env` file or docker-compose.yml:
+
 ```bash
 GOOGLE_SHEET_ID=your_google_sheet_id_here
 GOOGLE_SERVICE_ACCOUNT_CREDENTIALS='{"type":"service_account","project_id":"your-project-id",...}'
@@ -112,8 +119,20 @@ GOOGLE_SERVICE_ACCOUNT_CREDENTIALS='{"type":"service_account","project_id":"your
 The `GOOGLE_SERVICE_ACCOUNT_CREDENTIALS` should be the entire JSON file content as a single line string:
 
 ### Example Format:
+
 ```json
-{"type":"service_account","project_id":"your-project-123","private_key_id":"abc123","private_key":"-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANB...","client_email":"pc-laptop-sheets-sync@your-project-123.iam.gserviceaccount.com","client_id":"123456789","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/pc-laptop-sheets-sync%40your-project-123.iam.gserviceaccount.com"}
+{
+  "type": "service_account",
+  "project_id": "your-project-123",
+  "private_key_id": "abc123",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANB...",
+  "client_email": "pc-laptop-sheets-sync@your-project-123.iam.gserviceaccount.com",
+  "client_id": "123456789",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/pc-laptop-sheets-sync%40your-project-123.iam.gserviceaccount.com"
+}
 ```
 
 **Important:** Make sure the JSON is properly escaped if your platform requires it.
@@ -129,23 +148,28 @@ The `GOOGLE_SERVICE_ACCOUNT_CREDENTIALS` should be the entire JSON file content 
 ## Features After Setup
 
 ### Automatic Syncing
+
 - Data syncs automatically when you save PC/Laptop configurations
 - Updates happen within 2 seconds of saving changes
 - No manual intervention required
 
 ### Manual Sync Options
+
 - "Sync to Sheets" button on PC/Laptop Info page
 - "Export All Data" with direct Sheet sync on System Info page
 - Manual sync button on Google Sheets Config page
 
 ### Sheet Organization
+
 Your Google Sheet will contain these tabs:
+
 - **PC-Laptop Info**: Complete PC configurations with component details
 - **All System Assets**: Master list of all hardware assets
 - **Category Sheets**: Mouse, Keyboard, Motherboard, RAM, Storage, etc.
 - **Summary**: Data counts and overview
 
 ### Direct Access
+
 - "View Sheets" button opens your Google Sheet directly
 - Real-time collaboration with your team
 - Standard Google Sheets features (charts, filters, sharing, etc.)
@@ -193,6 +217,7 @@ Your Google Sheet will contain these tabs:
 ## Support
 
 If you encounter issues:
+
 1. Review this guide step by step
 2. Check the Google Sheets Config page for status information
 3. Verify your Google Cloud Console setup

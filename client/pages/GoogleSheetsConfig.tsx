@@ -117,7 +117,7 @@ export default function GoogleSheetsConfig() {
                 {isConfigured ? "Connected" : "Not Connected"}
               </Badge>
             </div>
-            
+
             {isConfigured && spreadsheetUrl && (
               <div className="flex items-center justify-between">
                 <span className="text-slate-300">Spreadsheet URL:</span>
@@ -165,16 +165,28 @@ export default function GoogleSheetsConfig() {
             <Alert className="bg-blue-500/10 border-blue-500/50 text-blue-400">
               <FileText className="h-4 w-4" />
               <AlertDescription>
-                To set up Google Sheets auto-sync, you need to configure environment variables on your server.
-                This requires administrative access to your deployment environment.
+                To set up Google Sheets auto-sync, you need to configure
+                environment variables on your server. This requires
+                administrative access to your deployment environment.
               </AlertDescription>
             </Alert>
 
             <div className="space-y-4">
               <div className="bg-slate-800/50 p-4 rounded-lg">
-                <h3 className="text-white font-semibold mb-3">Step 1: Create Google Service Account</h3>
+                <h3 className="text-white font-semibold mb-3">
+                  Step 1: Create Google Service Account
+                </h3>
                 <ol className="space-y-2 text-slate-300 text-sm list-decimal list-inside">
-                  <li>Go to <a href="https://console.cloud.google.com/" target="_blank" className="text-blue-400 hover:underline">Google Cloud Console</a></li>
+                  <li>
+                    Go to{" "}
+                    <a
+                      href="https://console.cloud.google.com/"
+                      target="_blank"
+                      className="text-blue-400 hover:underline"
+                    >
+                      Google Cloud Console
+                    </a>
+                  </li>
                   <li>Create a new project or select existing project</li>
                   <li>Enable Google Sheets API</li>
                   <li>Go to "IAM & Admin" → "Service Accounts"</li>
@@ -184,7 +196,9 @@ export default function GoogleSheetsConfig() {
               </div>
 
               <div className="bg-slate-800/50 p-4 rounded-lg">
-                <h3 className="text-white font-semibold mb-3">Step 2: Create Google Sheet</h3>
+                <h3 className="text-white font-semibold mb-3">
+                  Step 2: Create Google Sheet
+                </h3>
                 <ol className="space-y-2 text-slate-300 text-sm list-decimal list-inside">
                   <li>Create a new Google Sheet</li>
                   <li>Share the sheet with your service account email</li>
@@ -194,7 +208,9 @@ export default function GoogleSheetsConfig() {
               </div>
 
               <div className="bg-slate-800/50 p-4 rounded-lg">
-                <h3 className="text-white font-semibold mb-3">Step 3: Set Environment Variables</h3>
+                <h3 className="text-white font-semibold mb-3">
+                  Step 3: Set Environment Variables
+                </h3>
                 <div className="space-y-3">
                   <div>
                     <Label className="text-slate-300">GOOGLE_SHEET_ID</Label>
@@ -205,7 +221,11 @@ export default function GoogleSheetsConfig() {
                         className="bg-slate-700 border-slate-600 text-slate-300 font-mono text-sm"
                       />
                       <Button
-                        onClick={() => copyToClipboard("GOOGLE_SHEET_ID=your_google_sheet_id_here")}
+                        onClick={() =>
+                          copyToClipboard(
+                            "GOOGLE_SHEET_ID=your_google_sheet_id_here",
+                          )
+                        }
                         size="sm"
                         variant="outline"
                         className="border-slate-600 text-slate-300"
@@ -214,9 +234,11 @@ export default function GoogleSheetsConfig() {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div>
-                    <Label className="text-slate-300">GOOGLE_SERVICE_ACCOUNT_CREDENTIALS</Label>
+                    <Label className="text-slate-300">
+                      GOOGLE_SERVICE_ACCOUNT_CREDENTIALS
+                    </Label>
                     <div className="flex gap-2 mt-1">
                       <Input
                         value="your_service_account_json_credentials_here"
@@ -224,7 +246,11 @@ export default function GoogleSheetsConfig() {
                         className="bg-slate-700 border-slate-600 text-slate-300 font-mono text-sm"
                       />
                       <Button
-                        onClick={() => copyToClipboard("GOOGLE_SERVICE_ACCOUNT_CREDENTIALS=your_service_account_json_credentials_here")}
+                        onClick={() =>
+                          copyToClipboard(
+                            "GOOGLE_SERVICE_ACCOUNT_CREDENTIALS=your_service_account_json_credentials_here",
+                          )
+                        }
                         size="sm"
                         variant="outline"
                         className="border-slate-600 text-slate-300"
@@ -237,14 +263,28 @@ export default function GoogleSheetsConfig() {
               </div>
 
               <div className="bg-slate-800/50 p-4 rounded-lg">
-                <h3 className="text-white font-semibold mb-3">Step 4: Configure Deployment</h3>
+                <h3 className="text-white font-semibold mb-3">
+                  Step 4: Configure Deployment
+                </h3>
                 <div className="space-y-2 text-slate-300 text-sm">
-                  <p>Add the environment variables to your deployment platform:</p>
+                  <p>
+                    Add the environment variables to your deployment platform:
+                  </p>
                   <ul className="list-disc list-inside ml-4 space-y-1">
-                    <li><strong>Netlify:</strong> Site settings → Environment variables</li>
-                    <li><strong>Vercel:</strong> Project settings → Environment Variables</li>
-                    <li><strong>Railway:</strong> Project → Variables</li>
-                    <li><strong>Heroku:</strong> App settings → Config Vars</li>
+                    <li>
+                      <strong>Netlify:</strong> Site settings → Environment
+                      variables
+                    </li>
+                    <li>
+                      <strong>Vercel:</strong> Project settings → Environment
+                      Variables
+                    </li>
+                    <li>
+                      <strong>Railway:</strong> Project → Variables
+                    </li>
+                    <li>
+                      <strong>Heroku:</strong> App settings → Config Vars
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -259,10 +299,10 @@ export default function GoogleSheetsConfig() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-slate-300">
-              Once you've configured the environment variables and redeployed your application,
-              use the button below to test the connection:
+              Once you've configured the environment variables and redeployed
+              your application, use the button below to test the connection:
             </p>
-            
+
             <div className="flex gap-2">
               <Button
                 onClick={checkConfiguration}
@@ -270,7 +310,7 @@ export default function GoogleSheetsConfig() {
               >
                 Check Configuration
               </Button>
-              
+
               {isConfigured && (
                 <Button
                   onClick={testConnection}
@@ -294,28 +334,30 @@ export default function GoogleSheetsConfig() {
               <div className="space-y-2">
                 <h4 className="text-white font-medium">Automatic Syncing</h4>
                 <p className="text-slate-300 text-sm">
-                  Data automatically syncs to Google Sheets when you save PC/Laptop configurations
+                  Data automatically syncs to Google Sheets when you save
+                  PC/Laptop configurations
                 </p>
               </div>
-              
+
               <div className="space-y-2">
                 <h4 className="text-white font-medium">Multiple Sheets</h4>
                 <p className="text-slate-300 text-sm">
                   Organized data in separate sheets for each component category
                 </p>
               </div>
-              
+
               <div className="space-y-2">
                 <h4 className="text-white font-medium">Real-time Updates</h4>
                 <p className="text-slate-300 text-sm">
                   Changes reflect in Google Sheets within seconds of saving
                 </p>
               </div>
-              
+
               <div className="space-y-2">
                 <h4 className="text-white font-medium">Manual Sync</h4>
                 <p className="text-slate-300 text-sm">
-                  Force sync all data at any time with the "Sync to Sheets" button
+                  Force sync all data at any time with the "Sync to Sheets"
+                  button
                 </p>
               </div>
             </div>

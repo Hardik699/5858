@@ -45,8 +45,14 @@ const App = () => (
           <Route path="/system-info/:slug" element={<SystemInfoDetail />} />
           <Route path="/pc-laptop-info" element={<PCLaptopInfo />} />
           <Route path="/demo-data" element={<DemoDataView />} />
-          <Route path="/google-sheets-config" element={<GoogleSheetsConfig />} />
-          <Route path="/google-apps-script-config" element={<GoogleAppsScriptConfig />} />
+          <Route
+            path="/google-sheets-config"
+            element={<GoogleSheetsConfig />}
+          />
+          <Route
+            path="/google-apps-script-config"
+            element={<GoogleAppsScriptConfig />}
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

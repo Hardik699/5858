@@ -13,11 +13,13 @@ This guide shows you how to set up automatic syncing between your PC/Laptop mana
 ## 🚀 Quick Setup (5 minutes)
 
 ### Step 1: Create Your Google Sheet
+
 1. Go to [Google Sheets](https://sheets.google.com/)
 2. Create a new blank spreadsheet
 3. Name it "PC Laptop Assets Management"
 
 ### Step 2: Add the Apps Script
+
 1. In your Google Sheet: **Extensions → Apps Script**
 2. Delete the default code
 3. Copy the code from `google-apps-script/Code.gs` in your project
@@ -25,6 +27,7 @@ This guide shows you how to set up automatic syncing between your PC/Laptop mana
 5. Save the project (Ctrl+S)
 
 ### Step 3: Deploy as Web App
+
 1. Click **Deploy → New deployment**
 2. Click the gear icon → Select **Web app**
 3. Set **Execute as:** Me (your email)
@@ -33,6 +36,7 @@ This guide shows you how to set up automatic syncing between your PC/Laptop mana
 6. **Copy the Web app URL** that appears
 
 ### Step 4: Configure Your App
+
 1. In your PC/Laptop management app, click **"Google Sheets"** in navigation
 2. Paste the Web app URL in the configuration field
 3. Click **Save**
@@ -44,14 +48,16 @@ This guide shows you how to set up automatic syncing between your PC/Laptop mana
 Once configured, your Google Sheet will automatically contain:
 
 ### 📊 **Organized Sheets:**
+
 - **PC-Laptop Info** - Complete configurations with total RAM
-- **All System Assets** - Master inventory list  
+- **All System Assets** - Master inventory list
 - **Mouse, Keyboard, Motherboard** - Individual component sheets
 - **RAM, Storage, Camera, Headphone** - More component categories
 - **Power Supply, Monitor, Vonage** - Additional hardware
 - **Summary** - Data counts and overview
 
 ### ⚡ **Auto-Sync Features:**
+
 - **Real-time syncing** when you save PC/Laptop data
 - **2-second delay** to prevent too many API calls
 - **Manual sync buttons** on all relevant pages
@@ -60,11 +66,13 @@ Once configured, your Google Sheet will automatically contain:
 ## 💻 **Apps Script Code Location**
 
 The complete Google Apps Script code is in your project at:
+
 ```
 google-apps-script/Code.gs
 ```
 
 Key functions included:
+
 - `doPost()` - Handles incoming data from your app
 - `updatePCLaptopSheet()` - Creates PC/Laptop configurations sheet
 - `updateSystemAssetsSheet()` - Creates master assets sheet
@@ -74,16 +82,19 @@ Key functions included:
 ## 🔧 **Usage After Setup**
 
 ### Automatic Sync:
+
 - Data syncs automatically when you save PC/Laptop configurations
 - Updates appear in Google Sheets within 2 seconds
 - No manual action required
 
 ### Manual Sync:
+
 - **"Sync to Sheets"** buttons on PC/Laptop Info and System Info pages
 - **"Sync Now"** button on configuration page
 - **Test Connection** to verify setup
 
 ### Access Your Data:
+
 - Your Google Sheet updates in real-time
 - Share with team members for collaboration
 - Use Google Sheets features (charts, filters, etc.)
@@ -94,21 +105,25 @@ Key functions included:
 ### Common Issues:
 
 **"Web App URL not configured"**
+
 - Make sure you pasted the correct Web app URL
 - Ensure it ends with `/exec`
 - Verify you deployed the script as a Web app
 
 **"Connection test failed"**
+
 - Check that the Apps Script project was saved
 - Verify deployment settings (Execute as: Me, Access: Anyone)
 - Try redeploying the Web app
 
 **"Sync failed" error**
+
 - Check the Apps Script execution log for errors
 - Ensure your Google Sheet is accessible
 - Verify the script code was pasted correctly
 
 ### Getting Help:
+
 1. Visit the configuration page for detailed status
 2. Use "Test Connection" to diagnose issues
 3. Check Apps Script logs in the Google Apps Script editor
