@@ -22,7 +22,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import * as XLSX from 'xlsx';
-import { googleSheetsSync } from '@/lib/googleSheetsSync';
+import { googleAppsScriptSync } from '@/lib/googleAppsScriptSync';
 
 const items = [
   {
@@ -107,10 +107,9 @@ export default function SystemInfo() {
     const assets = existing ? JSON.parse(existing) : [];
     setAssetCount(assets.length);
 
-    // Check Google Sheets configuration
-    googleSheetsSync.checkConfiguration().then(configured => {
-      setIsGoogleSheetsConfigured(configured);
-    });
+    // Check Google Apps Script configuration
+    const configured = googleAppsScriptSync.isReady();
+    setIsGoogleSheetsConfigured(configured);
   }, []);
 
   const handleLoadDemo = () => {
@@ -385,20 +384,20 @@ export default function SystemInfo() {
             )}
             {isGoogleSheetsConfigured && assetCount > 0 && (
               <Button
-                onClick={() => googleSheetsSync.manualSync()}
+                onClick={() => googleAppsScriptSync.manualSync()}
                 className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
               >
                 <RefreshCw className="h-4 w-4" />
                 Sync to Sheets
               </Button>
             )}
-            {isGoogleSheetsConfigured && googleSheetsSync.getSpreadsheetUrl() && (
+            {!isGoogleSheetsConfigured && (
               <Button
-                onClick={() => window.open(googleSheetsSync.getSpreadsheetUrl(), '_blank')}
-                className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2"
+                onClick={() => navigate('/google-apps-script-config')}
+                className="bg-yellow-600 hover:bg-yellow-700 text-white flex items-center gap-2"
               >
-                <ExternalLink className="h-4 w-4" />
-                View Sheets
+                <Settings className="h-4 w-4" />
+                Setup Auto-Sync
               </Button>
             )}
             <Badge variant="secondary" className="bg-slate-700 text-slate-300">
