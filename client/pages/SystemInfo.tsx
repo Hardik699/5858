@@ -18,7 +18,7 @@ import {
   Phone,
   Database,
   Download,
-  Sync,
+  RefreshCw,
   ExternalLink,
 } from "lucide-react";
 import * as XLSX from 'xlsx';
@@ -388,7 +388,7 @@ export default function SystemInfo() {
                 onClick={() => googleSheetsSync.manualSync()}
                 className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
               >
-                <Sync className="h-4 w-4" />
+                <RefreshCw className="h-4 w-4" />
                 Sync to Sheets
               </Button>
             )}
