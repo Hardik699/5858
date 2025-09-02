@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { Edit, Download, Sync, ExternalLink } from "lucide-react";
+import { Edit, Download, RefreshCw, ExternalLink } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { googleSheetsSync, useGoogleSheetsAutoSync } from '@/lib/googleSheetsSync';
 
@@ -654,7 +654,7 @@ export default function PCLaptopInfo() {
                 onClick={() => googleSheetsSync.manualSync()}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2"
               >
-                <Sync className="h-4 w-4" />
+                <RefreshCw className="h-4 w-4" />
                 Sync to Sheets
               </Button>
             )}
