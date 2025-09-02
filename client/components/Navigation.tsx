@@ -81,7 +81,7 @@ export default function AppNav() {
   };
 
   const handleGoogleSheetsConfig = () => {
-    navigate("/google-sheets-config");
+    navigate("/google-apps-script-config");
   };
 
   return (
