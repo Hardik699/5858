@@ -18,8 +18,11 @@ import {
   Phone,
   Database,
   Download,
+  Sync,
+  ExternalLink,
 } from "lucide-react";
 import * as XLSX from 'xlsx';
+import { googleSheetsSync } from '@/lib/googleSheetsSync';
 
 const items = [
   {
@@ -97,11 +100,17 @@ const items = [
 export default function SystemInfo() {
   const navigate = useNavigate();
   const [assetCount, setAssetCount] = useState(0);
+  const [isGoogleSheetsConfigured, setIsGoogleSheetsConfigured] = useState(false);
 
   useEffect(() => {
     const existing = localStorage.getItem(STORAGE_KEY);
     const assets = existing ? JSON.parse(existing) : [];
     setAssetCount(assets.length);
+
+    // Check Google Sheets configuration
+    googleSheetsSync.checkConfiguration().then(configured => {
+      setIsGoogleSheetsConfigured(configured);
+    });
   }, []);
 
   const handleLoadDemo = () => {
@@ -372,6 +381,24 @@ export default function SystemInfo() {
               >
                 <Download className="h-4 w-4" />
                 Export All Data
+              </Button>
+            )}
+            {isGoogleSheetsConfigured && assetCount > 0 && (
+              <Button
+                onClick={() => googleSheetsSync.manualSync()}
+                className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+              >
+                <Sync className="h-4 w-4" />
+                Sync to Sheets
+              </Button>
+            )}
+            {isGoogleSheetsConfigured && googleSheetsSync.getSpreadsheetUrl() && (
+              <Button
+                onClick={() => window.open(googleSheetsSync.getSpreadsheetUrl(), '_blank')}
+                className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Sheets
               </Button>
             )}
             <Badge variant="secondary" className="bg-slate-700 text-slate-300">
