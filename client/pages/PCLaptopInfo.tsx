@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { Edit, Download, RefreshCw, ExternalLink } from "lucide-react";
+import { Edit, Download, RefreshCw, ExternalLink, Settings } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { googleAppsScriptSync, useGoogleAppsScriptAutoSync } from '@/lib/googleAppsScriptSync';
 
