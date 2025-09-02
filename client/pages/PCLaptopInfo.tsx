@@ -22,7 +22,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Edit, Download, RefreshCw, ExternalLink } from "lucide-react";
 import * as XLSX from 'xlsx';
-import { googleSheetsSync, useGoogleSheetsAutoSync } from '@/lib/googleSheetsSync';
+import { googleAppsScriptSync, useGoogleAppsScriptAutoSync } from '@/lib/googleAppsScriptSync';
 
 type Asset = {
   id: string;
@@ -88,13 +88,12 @@ export default function PCLaptopInfo() {
   });
   const [totalRam, setTotalRam] = useState("0GB");
   const [isGoogleSheetsConfigured, setIsGoogleSheetsConfigured] = useState(false);
-  const { triggerAutoSync } = useGoogleSheetsAutoSync();
+  const { triggerAutoSync } = useGoogleAppsScriptAutoSync();
 
-  // Check Google Sheets configuration on load
+  // Check Google Apps Script configuration on load
   useEffect(() => {
-    googleSheetsSync.checkConfiguration().then(configured => {
-      setIsGoogleSheetsConfigured(configured);
-    });
+    const configured = googleAppsScriptSync.isReady();
+    setIsGoogleSheetsConfigured(configured);
   }, []);
 
   // Helper function to get used IDs for a specific component type
@@ -651,20 +650,20 @@ export default function PCLaptopInfo() {
             </Button>
             {isGoogleSheetsConfigured && (
               <Button
-                onClick={() => googleSheetsSync.manualSync()}
+                onClick={() => googleAppsScriptSync.manualSync()}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2"
               >
                 <RefreshCw className="h-4 w-4" />
                 Sync to Sheets
               </Button>
             )}
-            {isGoogleSheetsConfigured && googleSheetsSync.getSpreadsheetUrl() && (
+            {!isGoogleSheetsConfigured && (
               <Button
-                onClick={() => window.open(googleSheetsSync.getSpreadsheetUrl(), '_blank')}
-                className="bg-purple-500 hover:bg-purple-600 text-white flex items-center gap-2"
+                onClick={() => navigate('/google-apps-script-config')}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white flex items-center gap-2"
               >
-                <ExternalLink className="h-4 w-4" />
-                View Sheets
+                <Settings className="h-4 w-4" />
+                Setup Sync
               </Button>
             )}
             <Button
