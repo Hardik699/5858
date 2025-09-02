@@ -84,6 +84,7 @@ export default function PCLaptopInfo() {
     ramId: "",
     ramId2: "",
   });
+  const [totalRam, setTotalRam] = useState("0GB");
 
   // Helper function to get used IDs for a specific component type
   const getUsedIds = (items: Asset[], field: keyof Asset): string[] => {
@@ -99,6 +100,39 @@ export default function PCLaptopInfo() {
   ): SysAsset[] => {
     return allAssets.filter((asset) => !usedIds.includes(asset.id));
   };
+
+  // Calculate total RAM whenever RAM selections change
+  const calculateTotalRam = () => {
+    const sysRaw = localStorage.getItem("systemAssets");
+    const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+
+    let total = 0;
+
+    // Get RAM 1 size
+    if (form.ramId && form.ramId !== "none") {
+      const ram1Details = sysList.find((item: any) => item.id === form.ramId);
+      if (ram1Details?.ramSize) {
+        const size1 = parseInt(ram1Details.ramSize.replace(/[^0-9]/g, '')) || 0;
+        total += size1;
+      }
+    }
+
+    // Get RAM 2 size
+    if (form.ramId2 && form.ramId2 !== "none") {
+      const ram2Details = sysList.find((item: any) => item.id === form.ramId2);
+      if (ram2Details?.ramSize) {
+        const size2 = parseInt(ram2Details.ramSize.replace(/[^0-9]/g, '')) || 0;
+        total += size2;
+      }
+    }
+
+    return total > 0 ? `${total}GB` : "0GB";
+  };
+
+  // Update total RAM when RAM selections change
+  useEffect(() => {
+    setTotalRam(calculateTotalRam());
+  }, [form.ramId, form.ramId2]);
 
   useEffect(() => {
     // Reset editing state on component load
@@ -826,33 +860,7 @@ export default function PCLaptopInfo() {
                 <div className="space-y-2">
                   <Label className="text-slate-300">Total RAM</Label>
                   <Input
-                    value={(() => {
-                      // Calculate total RAM from both slots
-                      const sysRaw = localStorage.getItem("systemAssets");
-                      const sysList = sysRaw ? JSON.parse(sysRaw) : [];
-
-                      let total = 0;
-
-                      // Get RAM 1 size
-                      if (form.ramId && form.ramId !== "none") {
-                        const ram1Details = sysList.find((item: any) => item.id === form.ramId);
-                        if (ram1Details?.ramSize) {
-                          const size1 = parseInt(ram1Details.ramSize.replace(/[^0-9]/g, '')) || 0;
-                          total += size1;
-                        }
-                      }
-
-                      // Get RAM 2 size
-                      if (form.ramId2 && form.ramId2 !== "none") {
-                        const ram2Details = sysList.find((item: any) => item.id === form.ramId2);
-                        if (ram2Details?.ramSize) {
-                          const size2 = parseInt(ram2Details.ramSize.replace(/[^0-9]/g, '')) || 0;
-                          total += size2;
-                        }
-                      }
-
-                      return total > 0 ? `${total}GB` : "0GB";
-                    })()}
+                    value={totalRam}
                     readOnly
                     className="bg-slate-800/50 border-slate-700 text-white font-semibold"
                   />
