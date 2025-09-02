@@ -20,6 +20,7 @@ import {
   Download,
   RefreshCw,
   ExternalLink,
+  Settings,
 } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { googleAppsScriptSync } from '@/lib/googleAppsScriptSync';
