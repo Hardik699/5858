@@ -20,8 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { Edit, Download } from "lucide-react";
+import { Edit, Download, Sync, ExternalLink } from "lucide-react";
 import * as XLSX from 'xlsx';
+import { googleSheetsSync, useGoogleSheetsAutoSync } from '@/lib/googleSheetsSync';
 
 type Asset = {
   id: string;
@@ -86,6 +87,15 @@ export default function PCLaptopInfo() {
     ramId2: "",
   });
   const [totalRam, setTotalRam] = useState("0GB");
+  const [isGoogleSheetsConfigured, setIsGoogleSheetsConfigured] = useState(false);
+  const { triggerAutoSync } = useGoogleSheetsAutoSync();
+
+  // Check Google Sheets configuration on load
+  useEffect(() => {
+    googleSheetsSync.checkConfiguration().then(configured => {
+      setIsGoogleSheetsConfigured(configured);
+    });
+  }, []);
 
   // Helper function to get used IDs for a specific component type
   const getUsedIds = (items: Asset[], field: keyof Asset): string[] => {
@@ -608,6 +618,11 @@ export default function PCLaptopInfo() {
       ramId2: "none",
     });
 
+    // Auto-sync to Google Sheets if configured
+    if (isGoogleSheetsConfigured) {
+      triggerAutoSync();
+    }
+
     alert(editingItem ? "Updated successfully!" : "Saved successfully!");
   };
 
@@ -634,6 +649,24 @@ export default function PCLaptopInfo() {
               <Download className="h-4 w-4" />
               Export Excel
             </Button>
+            {isGoogleSheetsConfigured && (
+              <Button
+                onClick={() => googleSheetsSync.manualSync()}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2"
+              >
+                <Sync className="h-4 w-4" />
+                Sync to Sheets
+              </Button>
+            )}
+            {isGoogleSheetsConfigured && googleSheetsSync.getSpreadsheetUrl() && (
+              <Button
+                onClick={() => window.open(googleSheetsSync.getSpreadsheetUrl(), '_blank')}
+                className="bg-purple-500 hover:bg-purple-600 text-white flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Sheets
+              </Button>
+            )}
             <Button
               onClick={() => navigate("/")}
               className="bg-slate-700 hover:bg-slate-600 text-white"
