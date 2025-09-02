@@ -31,10 +31,17 @@ type Asset = {
   cameraId?: string;
   headphoneId?: string;
   powerSupplyId?: string;
+  storageId?: string;
   ramId?: string;
+  ramId2?: string;
 };
 
-type SysAsset = { id: string; category: string };
+type SysAsset = {
+  id: string;
+  category: string;
+  storageType?: string;
+  storageCapacity?: string;
+};
 
 const STORAGE_KEY = "pcLaptopAssets";
 const SYS_STORAGE_KEY = "systemAssets";
@@ -316,6 +323,12 @@ export default function PCLaptopInfo() {
           : undefined,
       ramId:
         form.ramId && form.ramId !== "none" ? form.ramId.trim() : undefined,
+      ramId2:
+        form.ramId2 && form.ramId2 !== "none" ? form.ramId2.trim() : undefined,
+      storageId:
+        (form as any).storageId && (form as any).storageId !== "none"
+          ? (form as any).storageId.trim()
+          : undefined,
     };
 
     let next: Asset[];
@@ -712,11 +725,60 @@ export default function PCLaptopInfo() {
                           No available RAM items
                         </div>
                       ) : (
-                        ramAssets.map((m) => (
-                          <SelectItem key={m.id} value={m.id}>
-                            {m.id}
-                          </SelectItem>
-                        ))
+                        ramAssets.map((m) => {
+                          // Get RAM details from systemAssets
+                          const sysRaw = localStorage.getItem("systemAssets");
+                          const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                          const ramDetails = sysList.find((item: any) => item.id === m.id);
+
+                          return (
+                            <SelectItem key={m.id} value={m.id}>
+                              {m.id} ({ramDetails?.ramSize || 'RAM'})
+                            </SelectItem>
+                          );
+                        })
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-slate-300">Storage (SSD/HDD)</Label>
+                  <Select
+                    value={(form as any).storageId}
+                    onValueChange={(v) =>
+                      setForm((s) => ({ ...s, storageId: v }))
+                    }
+                  >
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue
+                        placeholder={
+                          storageAssets.length
+                            ? "Select available storage"
+                            : "No available storage"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      <SelectItem value="none">
+                        <span className="text-slate-400">-- No Storage --</span>
+                      </SelectItem>
+                      {storageAssets.length === 0 ? (
+                        <div className="px-3 py-2 text-slate-400">
+                          No available storage items
+                        </div>
+                      ) : (
+                        storageAssets.map((s) => {
+                          // Get storage details from systemAssets
+                          const sysRaw = localStorage.getItem("systemAssets");
+                          const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                          const storageDetails = sysList.find((item: any) => item.id === s.id);
+
+                          return (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.id} ({storageDetails?.storageType || 'Storage'} - {storageDetails?.storageCapacity || 'Unknown'})
+                            </SelectItem>
+                          );
+                        })
                       )}
                     </SelectContent>
                   </Select>
@@ -745,11 +807,18 @@ export default function PCLaptopInfo() {
                           No available RAM items
                         </div>
                       ) : (
-                        ramAssets.map((m) => (
-                          <SelectItem key={m.id} value={m.id}>
-                            {m.id}
-                          </SelectItem>
-                        ))
+                        ramAssets.map((m) => {
+                          // Get RAM details from systemAssets
+                          const sysRaw = localStorage.getItem("systemAssets");
+                          const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                          const ramDetails = sysList.find((item: any) => item.id === m.id);
+
+                          return (
+                            <SelectItem key={m.id} value={m.id}>
+                              {m.id} ({ramDetails?.ramSize || 'RAM'})
+                            </SelectItem>
+                          );
+                        })
                       )}
                     </SelectContent>
                   </Select>
@@ -797,8 +866,9 @@ export default function PCLaptopInfo() {
                       <TableHead>Camera ID</TableHead>
                       <TableHead>Headphone ID</TableHead>
                       <TableHead>Power Supply ID</TableHead>
-                      <TableHead>RAM ID</TableHead>
-                      <TableHead>RAM 2 ID</TableHead>
+                      <TableHead>Storage ID</TableHead>
+                      <TableHead>RAM Slot 1</TableHead>
+                      <TableHead>RAM Slot 2</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -812,8 +882,51 @@ export default function PCLaptopInfo() {
                         <TableCell>{a.cameraId || "-"}</TableCell>
                         <TableCell>{a.headphoneId || "-"}</TableCell>
                         <TableCell>{a.powerSupplyId || "-"}</TableCell>
-                        <TableCell>{a.ramId || "-"}</TableCell>
-                        <TableCell>{a.ramId2 || "-"}</TableCell>
+                        <TableCell>
+                          {(() => {
+                            const storageId = (a as any).storageId;
+                            if (!storageId) return "-";
+
+                            // Get storage details from systemAssets
+                            const sysRaw = localStorage.getItem("systemAssets");
+                            const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                            const storageDetails = sysList.find((item: any) => item.id === storageId);
+
+                            return storageDetails
+                              ? `${storageId} (${storageDetails.storageType || 'Storage'} - ${storageDetails.storageCapacity || 'Unknown'})`
+                              : storageId;
+                          })()}
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            const ramId = a.ramId;
+                            if (!ramId) return "-";
+
+                            // Get RAM details from systemAssets
+                            const sysRaw = localStorage.getItem("systemAssets");
+                            const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                            const ramDetails = sysList.find((item: any) => item.id === ramId);
+
+                            return ramDetails
+                              ? `${ramId} (${ramDetails.ramSize || 'RAM'})`
+                              : ramId;
+                          })()}
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            const ramId2 = (a as any).ramId2;
+                            if (!ramId2) return "-";
+
+                            // Get RAM details from systemAssets
+                            const sysRaw = localStorage.getItem("systemAssets");
+                            const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                            const ramDetails = sysList.find((item: any) => item.id === ramId2);
+
+                            return ramDetails
+                              ? `${ramId2} (${ramDetails.ramSize || 'RAM'})`
+                              : ramId2;
+                          })()}
+                        </TableCell>
                         <TableCell>
                           <Button
                             onClick={() => openForm(a)}
