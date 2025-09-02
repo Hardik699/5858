@@ -823,6 +823,40 @@ export default function PCLaptopInfo() {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="space-y-2">
+                  <Label className="text-slate-300">Total RAM</Label>
+                  <Input
+                    value={(() => {
+                      // Calculate total RAM from both slots
+                      const sysRaw = localStorage.getItem("systemAssets");
+                      const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+
+                      let total = 0;
+
+                      // Get RAM 1 size
+                      if (form.ramId && form.ramId !== "none") {
+                        const ram1Details = sysList.find((item: any) => item.id === form.ramId);
+                        if (ram1Details?.ramSize) {
+                          const size1 = parseInt(ram1Details.ramSize.replace(/[^0-9]/g, '')) || 0;
+                          total += size1;
+                        }
+                      }
+
+                      // Get RAM 2 size
+                      if (form.ramId2 && form.ramId2 !== "none") {
+                        const ram2Details = sysList.find((item: any) => item.id === form.ramId2);
+                        if (ram2Details?.ramSize) {
+                          const size2 = parseInt(ram2Details.ramSize.replace(/[^0-9]/g, '')) || 0;
+                          total += size2;
+                        }
+                      }
+
+                      return total > 0 ? `${total}GB` : "0GB";
+                    })()}
+                    readOnly
+                    className="bg-slate-800/50 border-slate-700 text-white font-semibold"
+                  />
+                </div>
                 <div className="md:col-span-2 flex justify-end gap-2">
                   <Button
                     type="button"
@@ -869,6 +903,7 @@ export default function PCLaptopInfo() {
                       <TableHead>Storage ID</TableHead>
                       <TableHead>RAM Slot 1</TableHead>
                       <TableHead>RAM Slot 2</TableHead>
+                      <TableHead>Total RAM</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -925,6 +960,35 @@ export default function PCLaptopInfo() {
                             return ramDetails
                               ? `${ramId2} (${ramDetails.ramSize || 'RAM'})`
                               : ramId2;
+                          })()}
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            // Calculate total RAM from both slots
+                            const sysRaw = localStorage.getItem("systemAssets");
+                            const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+
+                            let total = 0;
+
+                            // Get RAM 1 size
+                            if (a.ramId) {
+                              const ram1Details = sysList.find((item: any) => item.id === a.ramId);
+                              if (ram1Details?.ramSize) {
+                                const size1 = parseInt(ram1Details.ramSize.replace(/[^0-9]/g, '')) || 0;
+                                total += size1;
+                              }
+                            }
+
+                            // Get RAM 2 size
+                            if ((a as any).ramId2) {
+                              const ram2Details = sysList.find((item: any) => item.id === (a as any).ramId2);
+                              if (ram2Details?.ramSize) {
+                                const size2 = parseInt(ram2Details.ramSize.replace(/[^0-9]/g, '')) || 0;
+                                total += size2;
+                              }
+                            }
+
+                            return total > 0 ? `${total}GB` : "-";
                           })()}
                         </TableCell>
                         <TableCell>
