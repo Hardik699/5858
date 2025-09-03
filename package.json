@@ -1,6 +1,7 @@
 {
   "name": "fusion-starter",
   "private": true,
+  "homepage": "https://hardik699.github.io/5858",
   "type": "module",
   "pkg": {
     "assets": [
@@ -23,11 +24,9 @@
   "dependencies": {
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "googleapis": "^159.0.0",
     "mime-types": "^3.0.1",
     "multer": "^2.0.2",
     "nanoid": "^5.1.5",
-    "xlsx": "^0.18.5",
     "zod": "^3.25.76"
   },
   "devDependencies": {
