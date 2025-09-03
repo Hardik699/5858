@@ -24,6 +24,7 @@ import {
   Users,
   Building2,
   LayoutDashboard,
+  FileSpreadsheet,
 } from "lucide-react";
 
 export default function AppNav() {
@@ -79,6 +80,10 @@ export default function AppNav() {
     navigate("/deshbord");
   };
 
+  const handleGoogleSheetsConfig = () => {
+    navigate("/google-apps-script-config");
+  };
+
   return (
     <nav className="sticky top-0 z-50 border-b border-white/10 bg-slate-900/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -132,6 +137,15 @@ export default function AppNav() {
                     >
                       <Building2 className="h-4 w-4 mr-2" />
                       HR Dashboard
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGoogleSheetsConfig}
+                      className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white transition-all duration-300"
+                    >
+                      <FileSpreadsheet className="h-4 w-4 mr-2" />
+                      Google Sheets
                     </Button>
                   </>
                 )}
@@ -240,6 +254,17 @@ export default function AppNav() {
                           >
                             <Building2 className="h-4 w-4 mr-2" />
                             HR Dashboard
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start border-slate-600 text-slate-300 hover:bg-slate-700"
+                            onClick={() => {
+                              handleGoogleSheetsConfig();
+                              setIsMobileMenuOpen(false);
+                            }}
+                          >
+                            <FileSpreadsheet className="h-4 w-4 mr-2" />
+                            Google Sheets
                           </Button>
                         </>
                       )}

@@ -1,6 +1,7 @@
 {
   "name": "fusion-starter",
   "private": true,
+  "homepage": "https://hardik699.github.io/5858",
   "type": "module",
   "pkg": {
     "assets": [

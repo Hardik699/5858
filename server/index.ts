@@ -5,6 +5,10 @@ import path from "path";
 import { handleDemo } from "./routes/demo";
 import { attachIdentity } from "./middleware/auth";
 import { salariesRouter } from "./routes/salaries";
+import {
+  syncToGoogleSheets,
+  getSpreadsheetInfo,
+} from "./services/googleSheets";
 
 export function createServer() {
   const app = express();
@@ -28,6 +32,10 @@ export function createServer() {
 
   // Salaries API
   app.use("/api/salaries", salariesRouter());
+
+  // Google Sheets API
+  app.post("/api/google-sheets/sync", syncToGoogleSheets);
+  app.get("/api/google-sheets/info", getSpreadsheetInfo);
 
   return app;
 }

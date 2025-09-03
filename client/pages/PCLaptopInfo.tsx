@@ -20,7 +20,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { Edit } from "lucide-react";
+import {
+  Edit,
+  Download,
+  RefreshCw,
+  ExternalLink,
+  Settings,
+} from "lucide-react";
+import * as XLSX from "xlsx";
+import {
+  googleAppsScriptSync,
+  useGoogleAppsScriptAutoSync,
+} from "@/lib/googleAppsScriptSync";
 
 type Asset = {
   id: string;
@@ -31,10 +42,17 @@ type Asset = {
   cameraId?: string;
   headphoneId?: string;
   powerSupplyId?: string;
+  storageId?: string;
   ramId?: string;
+  ramId2?: string;
 };
 
-type SysAsset = { id: string; category: string };
+type SysAsset = {
+  id: string;
+  category: string;
+  storageType?: string;
+  storageCapacity?: string;
+};
 
 const STORAGE_KEY = "pcLaptopAssets";
 const SYS_STORAGE_KEY = "systemAssets";
@@ -77,6 +95,16 @@ export default function PCLaptopInfo() {
     ramId: "",
     ramId2: "",
   });
+  const [totalRam, setTotalRam] = useState("0GB");
+  const [isGoogleSheetsConfigured, setIsGoogleSheetsConfigured] =
+    useState(false);
+  const { triggerAutoSync } = useGoogleAppsScriptAutoSync();
+
+  // Check Google Apps Script configuration on load
+  useEffect(() => {
+    const configured = googleAppsScriptSync.isReady();
+    setIsGoogleSheetsConfigured(configured);
+  }, []);
 
   // Helper function to get used IDs for a specific component type
   const getUsedIds = (items: Asset[], field: keyof Asset): string[] => {
@@ -91,6 +119,199 @@ export default function PCLaptopInfo() {
     usedIds: string[],
   ): SysAsset[] => {
     return allAssets.filter((asset) => !usedIds.includes(asset.id));
+  };
+
+  // Calculate total RAM whenever RAM selections change
+  const calculateTotalRam = () => {
+    const sysRaw = localStorage.getItem("systemAssets");
+    const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+
+    let total = 0;
+
+    // Get RAM 1 size
+    if (form.ramId && form.ramId !== "none") {
+      const ram1Details = sysList.find((item: any) => item.id === form.ramId);
+      if (ram1Details?.ramSize) {
+        const size1 = parseInt(ram1Details.ramSize.replace(/[^0-9]/g, "")) || 0;
+        total += size1;
+      }
+    }
+
+    // Get RAM 2 size
+    if (form.ramId2 && form.ramId2 !== "none") {
+      const ram2Details = sysList.find((item: any) => item.id === form.ramId2);
+      if (ram2Details?.ramSize) {
+        const size2 = parseInt(ram2Details.ramSize.replace(/[^0-9]/g, "")) || 0;
+        total += size2;
+      }
+    }
+
+    return total > 0 ? `${total}GB` : "0GB";
+  };
+
+  // Update total RAM when RAM selections change
+  useEffect(() => {
+    setTotalRam(calculateTotalRam());
+  }, [form.ramId, form.ramId2]);
+
+  // Export to Excel function
+  const exportToExcel = () => {
+    try {
+      // Get all data from localStorage
+      const pcLaptopData = JSON.parse(
+        localStorage.getItem(STORAGE_KEY) || "[]",
+      );
+      const systemAssetsData = JSON.parse(
+        localStorage.getItem(SYS_STORAGE_KEY) || "[]",
+      );
+
+      // Create a new workbook
+      const workbook = XLSX.utils.book_new();
+
+      // 1. PC/Laptop Info Sheet
+      const pcLaptopSheet = pcLaptopData.map((item: Asset) => {
+        const sysAssets = systemAssetsData;
+
+        // Get storage details
+        const storageDetails = item.storageId
+          ? sysAssets.find((s: any) => s.id === item.storageId)
+          : null;
+
+        // Get RAM details
+        const ram1Details = item.ramId
+          ? sysAssets.find((s: any) => s.id === item.ramId)
+          : null;
+        const ram2Details = (item as any).ramId2
+          ? sysAssets.find((s: any) => s.id === (item as any).ramId2)
+          : null;
+
+        // Calculate total RAM
+        let totalRam = 0;
+        if (ram1Details?.ramSize) {
+          totalRam += parseInt(ram1Details.ramSize.replace(/[^0-9]/g, "")) || 0;
+        }
+        if (ram2Details?.ramSize) {
+          totalRam += parseInt(ram2Details.ramSize.replace(/[^0-9]/g, "")) || 0;
+        }
+
+        return {
+          "PC/Laptop ID": item.id,
+          "Mouse ID": item.mouseId || "-",
+          "Keyboard ID": item.keyboardId || "-",
+          "Motherboard ID": item.motherboardId || "-",
+          "Camera ID": item.cameraId || "-",
+          "Headphone ID": item.headphoneId || "-",
+          "Power Supply ID": item.powerSupplyId || "-",
+          "Storage ID": item.storageId || "-",
+          "Storage Type": storageDetails?.storageType || "-",
+          "Storage Capacity": storageDetails?.storageCapacity || "-",
+          "RAM Slot 1 ID": item.ramId || "-",
+          "RAM Slot 1 Size": ram1Details?.ramSize || "-",
+          "RAM Slot 2 ID": (item as any).ramId2 || "-",
+          "RAM Slot 2 Size": ram2Details?.ramSize || "-",
+          "Total RAM": totalRam > 0 ? `${totalRam}GB` : "-",
+          "Created Date": new Date(item.createdAt).toLocaleDateString(),
+        };
+      });
+
+      const pcLaptopWS = XLSX.utils.json_to_sheet(pcLaptopSheet);
+      XLSX.utils.book_append_sheet(workbook, pcLaptopWS, "PC-Laptop Info");
+
+      // 2. Create sheets for each asset category
+      const categories = [
+        { name: "Mouse", category: "mouse" },
+        { name: "Keyboard", category: "keyboard" },
+        { name: "Motherboard", category: "motherboard" },
+        { name: "RAM", category: "ram" },
+        { name: "Storage", category: "storage" },
+        { name: "Camera", category: "camera" },
+        { name: "Headphone", category: "headphone" },
+        { name: "Power Supply", category: "power-supply" },
+        { name: "Monitor", category: "monitor" },
+        { name: "Vonage", category: "vonage" },
+      ];
+
+      categories.forEach(({ name, category }) => {
+        const categoryData = systemAssetsData
+          .filter((asset: any) => asset.category === category)
+          .map((asset: any) => {
+            const baseData = {
+              "Asset ID": asset.id,
+              Category: asset.category,
+              "Serial Number": asset.serialNumber || "-",
+              "Vendor Name": asset.vendorName || "-",
+              "Company Name": asset.companyName || "-",
+              "Purchase Date": asset.purchaseDate
+                ? new Date(asset.purchaseDate).toLocaleDateString()
+                : "-",
+              "Warranty End Date": asset.warrantyEndDate
+                ? new Date(asset.warrantyEndDate).toLocaleDateString()
+                : "-",
+              "Created Date": new Date(asset.createdAt).toLocaleDateString(),
+            };
+
+            // Add category-specific fields
+            if (category === "ram") {
+              return {
+                ...baseData,
+                "RAM Size": asset.ramSize || "-",
+                "RAM Type": asset.ramType || "-",
+              };
+            } else if (category === "motherboard") {
+              return {
+                ...baseData,
+                "Processor Model": asset.processorModel || "-",
+              };
+            } else if (category === "storage") {
+              return {
+                ...baseData,
+                "Storage Type": asset.storageType || "-",
+                "Storage Capacity": asset.storageCapacity || "-",
+              };
+            } else if (category === "vonage") {
+              return {
+                ...baseData,
+                "Vonage Number": asset.vonageNumber || "-",
+                "Extension Code": asset.vonageExtCode || "-",
+                Password: asset.vonagePassword || "-",
+              };
+            }
+
+            return baseData;
+          });
+
+        if (categoryData.length > 0) {
+          const categoryWS = XLSX.utils.json_to_sheet(categoryData);
+          XLSX.utils.book_append_sheet(workbook, categoryWS, name);
+        }
+      });
+
+      // 3. Summary Sheet
+      const summaryData = [
+        { "Data Type": "Total PC/Laptops", Count: pcLaptopData.length },
+        ...categories.map(({ name, category }) => ({
+          "Data Type": `Total ${name}`,
+          Count: systemAssetsData.filter(
+            (asset: any) => asset.category === category,
+          ).length,
+        })),
+      ];
+
+      const summaryWS = XLSX.utils.json_to_sheet(summaryData);
+      XLSX.utils.book_append_sheet(workbook, summaryWS, "Summary");
+
+      // Generate filename with current date
+      const now = new Date();
+      const filename = `PC_Laptop_Assets_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}.xlsx`;
+
+      // Write the file
+      XLSX.writeFile(workbook, filename);
+
+      alert(`Excel file exported successfully: ${filename}`);
+    } catch (error) {
+      console.error("Export error:", error);
+      alert("Error exporting to Excel. Please try again.");
+    }
   };
 
   useEffect(() => {
@@ -316,6 +537,12 @@ export default function PCLaptopInfo() {
           : undefined,
       ramId:
         form.ramId && form.ramId !== "none" ? form.ramId.trim() : undefined,
+      ramId2:
+        form.ramId2 && form.ramId2 !== "none" ? form.ramId2.trim() : undefined,
+      storageId:
+        (form as any).storageId && (form as any).storageId !== "none"
+          ? (form as any).storageId.trim()
+          : undefined,
     };
 
     let next: Asset[];
@@ -416,6 +643,11 @@ export default function PCLaptopInfo() {
       ramId2: "none",
     });
 
+    // Auto-sync to Google Sheets if configured
+    if (isGoogleSheetsConfigured) {
+      triggerAutoSync();
+    }
+
     alert(editingItem ? "Updated successfully!" : "Saved successfully!");
   };
 
@@ -435,6 +667,31 @@ export default function PCLaptopInfo() {
             >
               Add
             </Button>
+            <Button
+              onClick={exportToExcel}
+              className="bg-green-500 hover:bg-green-600 text-white flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export Excel
+            </Button>
+            {isGoogleSheetsConfigured && (
+              <Button
+                onClick={() => googleAppsScriptSync.manualSync()}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Sync to Sheets
+              </Button>
+            )}
+            {!isGoogleSheetsConfigured && (
+              <Button
+                onClick={() => navigate("/google-apps-script-config")}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white flex items-center gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                Setup Sync
+              </Button>
+            )}
             <Button
               onClick={() => navigate("/")}
               className="bg-slate-700 hover:bg-slate-600 text-white"
@@ -712,11 +969,65 @@ export default function PCLaptopInfo() {
                           No available RAM items
                         </div>
                       ) : (
-                        ramAssets.map((m) => (
-                          <SelectItem key={m.id} value={m.id}>
-                            {m.id}
-                          </SelectItem>
-                        ))
+                        ramAssets.map((m) => {
+                          // Get RAM details from systemAssets
+                          const sysRaw = localStorage.getItem("systemAssets");
+                          const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                          const ramDetails = sysList.find(
+                            (item: any) => item.id === m.id,
+                          );
+
+                          return (
+                            <SelectItem key={m.id} value={m.id}>
+                              {m.id} ({ramDetails?.ramSize || "RAM"})
+                            </SelectItem>
+                          );
+                        })
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-slate-300">Storage (SSD/HDD)</Label>
+                  <Select
+                    value={(form as any).storageId}
+                    onValueChange={(v) =>
+                      setForm((s) => ({ ...s, storageId: v }))
+                    }
+                  >
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue
+                        placeholder={
+                          storageAssets.length
+                            ? "Select available storage"
+                            : "No available storage"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      <SelectItem value="none">
+                        <span className="text-slate-400">-- No Storage --</span>
+                      </SelectItem>
+                      {storageAssets.length === 0 ? (
+                        <div className="px-3 py-2 text-slate-400">
+                          No available storage items
+                        </div>
+                      ) : (
+                        storageAssets.map((s) => {
+                          // Get storage details from systemAssets
+                          const sysRaw = localStorage.getItem("systemAssets");
+                          const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                          const storageDetails = sysList.find(
+                            (item: any) => item.id === s.id,
+                          );
+
+                          return (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.id} ({storageDetails?.storageType || "Storage"}{" "}
+                              - {storageDetails?.storageCapacity || "Unknown"})
+                            </SelectItem>
+                          );
+                        })
                       )}
                     </SelectContent>
                   </Select>
@@ -745,14 +1056,31 @@ export default function PCLaptopInfo() {
                           No available RAM items
                         </div>
                       ) : (
-                        ramAssets.map((m) => (
-                          <SelectItem key={m.id} value={m.id}>
-                            {m.id}
-                          </SelectItem>
-                        ))
+                        ramAssets.map((m) => {
+                          // Get RAM details from systemAssets
+                          const sysRaw = localStorage.getItem("systemAssets");
+                          const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                          const ramDetails = sysList.find(
+                            (item: any) => item.id === m.id,
+                          );
+
+                          return (
+                            <SelectItem key={m.id} value={m.id}>
+                              {m.id} ({ramDetails?.ramSize || "RAM"})
+                            </SelectItem>
+                          );
+                        })
                       )}
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-slate-300">Total RAM</Label>
+                  <Input
+                    value={totalRam}
+                    readOnly
+                    className="bg-slate-800/50 border-slate-700 text-white font-semibold"
+                  />
                 </div>
                 <div className="md:col-span-2 flex justify-end gap-2">
                   <Button
@@ -797,8 +1125,10 @@ export default function PCLaptopInfo() {
                       <TableHead>Camera ID</TableHead>
                       <TableHead>Headphone ID</TableHead>
                       <TableHead>Power Supply ID</TableHead>
-                      <TableHead>RAM ID</TableHead>
-                      <TableHead>RAM 2 ID</TableHead>
+                      <TableHead>Storage ID</TableHead>
+                      <TableHead>RAM Slot 1</TableHead>
+                      <TableHead>RAM Slot 2</TableHead>
+                      <TableHead>Total RAM</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -812,8 +1142,96 @@ export default function PCLaptopInfo() {
                         <TableCell>{a.cameraId || "-"}</TableCell>
                         <TableCell>{a.headphoneId || "-"}</TableCell>
                         <TableCell>{a.powerSupplyId || "-"}</TableCell>
-                        <TableCell>{a.ramId || "-"}</TableCell>
-                        <TableCell>{a.ramId2 || "-"}</TableCell>
+                        <TableCell>
+                          {(() => {
+                            const storageId = (a as any).storageId;
+                            if (!storageId) return "-";
+
+                            // Get storage details from systemAssets
+                            const sysRaw = localStorage.getItem("systemAssets");
+                            const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                            const storageDetails = sysList.find(
+                              (item: any) => item.id === storageId,
+                            );
+
+                            return storageDetails
+                              ? `${storageId} (${storageDetails.storageType || "Storage"} - ${storageDetails.storageCapacity || "Unknown"})`
+                              : storageId;
+                          })()}
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            const ramId = a.ramId;
+                            if (!ramId) return "-";
+
+                            // Get RAM details from systemAssets
+                            const sysRaw = localStorage.getItem("systemAssets");
+                            const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                            const ramDetails = sysList.find(
+                              (item: any) => item.id === ramId,
+                            );
+
+                            return ramDetails
+                              ? `${ramId} (${ramDetails.ramSize || "RAM"})`
+                              : ramId;
+                          })()}
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            const ramId2 = (a as any).ramId2;
+                            if (!ramId2) return "-";
+
+                            // Get RAM details from systemAssets
+                            const sysRaw = localStorage.getItem("systemAssets");
+                            const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+                            const ramDetails = sysList.find(
+                              (item: any) => item.id === ramId2,
+                            );
+
+                            return ramDetails
+                              ? `${ramId2} (${ramDetails.ramSize || "RAM"})`
+                              : ramId2;
+                          })()}
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            // Calculate total RAM from both slots
+                            const sysRaw = localStorage.getItem("systemAssets");
+                            const sysList = sysRaw ? JSON.parse(sysRaw) : [];
+
+                            let total = 0;
+
+                            // Get RAM 1 size
+                            if (a.ramId) {
+                              const ram1Details = sysList.find(
+                                (item: any) => item.id === a.ramId,
+                              );
+                              if (ram1Details?.ramSize) {
+                                const size1 =
+                                  parseInt(
+                                    ram1Details.ramSize.replace(/[^0-9]/g, ""),
+                                  ) || 0;
+                                total += size1;
+                              }
+                            }
+
+                            // Get RAM 2 size
+                            if ((a as any).ramId2) {
+                              const ram2Details = sysList.find(
+                                (item: any) => item.id === (a as any).ramId2,
+                              );
+                              if (ram2Details?.ramSize) {
+                                const size2 =
+                                  parseInt(
+                                    ram2Details.ramSize.replace(/[^0-9]/g, ""),
+                                  ) || 0;
+                                total += size2;
+                              }
+                            }
+
+                            return total > 0 ? `${total}GB` : "-";
+                          })()}
+                        </TableCell>
                         <TableCell>
                           <Button
                             onClick={() => openForm(a)}
